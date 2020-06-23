@@ -18,10 +18,10 @@ public class TimeEntryController {
     public TimeEntryController(TimeEntryRepository timeEntryRepository) {
         this.timeEntryRepository = timeEntryRepository;
     }
-    @GetMapping("/time-entries/{id}")
-    public ResponseEntity read(@PathVariable long nonExistentTimeEntryId) {
+    @GetMapping("{id}")
+    public ResponseEntity read(@PathVariable long id) {
 
-        TimeEntry createdTimeEntry = timeEntryRepository.find(nonExistentTimeEntryId);
+        TimeEntry createdTimeEntry = timeEntryRepository.find(id);
         if(null==createdTimeEntry)
             return new ResponseEntity<>(createdTimeEntry, HttpStatus.NOT_FOUND);
         else
