@@ -2,45 +2,57 @@ package io.pivotal.pal.tracker;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
+@RestController
+@RequestMapping("/time-entries")
 public class TimeEntryController {
+
+    private TimeEntryRepository timeEntryRepository ;
+   // private InMemoryTimeEntryRepository inMemoryTimeEntryRepository ;
     public TimeEntryController(TimeEntryRepository timeEntryRepository) {
+        this.timeEntryRepository = timeEntryRepository;
+    }
+    @GetMapping("/time-entries/{id}")
+    public ResponseEntity read(@PathVariable long nonExistentTimeEntryId) {
+
+        TimeEntry createdTimeEntry = timeEntryRepository.find(nonExistentTimeEntryId);
+        if(null==createdTimeEntry)
+            return new ResponseEntity<>(createdTimeEntry, HttpStatus.NOT_FOUND);
+        else
+            return new ResponseEntity<>(createdTimeEntry, HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TimeEntry>> list() {
+        return new ResponseEntity<List<TimeEntry>>(timeEntryRepository.list(), HttpStatus.OK);
 
     }
 
-    public ResponseEntity read(long nonExistentTimeEntryId) {
-
-        TimeEntry createdTimeEntry = new TimeEntry(1, 987L, 654L, LocalDate.parse("2017-01-08"), 8);
-        return new ResponseEntity<>(createdTimeEntry, HttpStatus.OK);
+    @PutMapping
+    public ResponseEntity update(@PathVariable long timeEntryId, @RequestBody TimeEntry timeEntry) {
+        TimeEntry createdTimeEntry = timeEntryRepository.update(timeEntryId, timeEntry);
+        if(null==createdTimeEntry)
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        else
+            return new ResponseEntity<>(createdTimeEntry, HttpStatus.OK);
     }
 
-  /*  public ResponseEntity<List<TimeEntry>> list() {
+    @PostMapping
+    public ResponseEntity create(@RequestBody TimeEntry timeEntryToCreate) {
 
-        //ResponseEntity<TimeEntry> res = new ResponseEntity<TimeEntry>();  return res;
-        TimeEntry createdTimeEntry = timeEntriesRepo.create(timeEntry);
-        TimeEntry timeEntry =
-        return new ResponseEntity<List<TimeEntry>>(createdTimeEntry, HttpStatus.NOT_FOUND);
-
-    }*/
-
-    public ResponseEntity update(long timeEntryId, TimeEntry expected) {
-
-        expected = new TimeEntry(1L, 987L, 654L, LocalDate.parse("2017-01-07"), 4);
-        return new ResponseEntity<>(expected, HttpStatus.OK);
+        TimeEntry newTimeEntry = timeEntryRepository.create(timeEntryToCreate);
+        return new ResponseEntity<>(newTimeEntry, HttpStatus.CREATED);
     }
 
-    public ResponseEntity create(TimeEntry timeEntryToCreate) {
-
-        timeEntryToCreate = new TimeEntry(1L, 987L, 654L, LocalDate.parse("2017-01-07"), 4);
-        return new ResponseEntity<>(timeEntryToCreate, HttpStatus.CREATED);
-    }
-
+    @DeleteMapping
     public ResponseEntity delete(long timeEntryId) {
-        TimeEntry createdTimeEntry = new TimeEntry(1L, 987L, 654L, LocalDate.parse("2017-01-07"), 4);
-        return new ResponseEntity<>(createdTimeEntry, HttpStatus.NO_CONTENT);
+        timeEntryRepository.delete(timeEntryId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
