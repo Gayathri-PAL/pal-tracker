@@ -50,9 +50,9 @@ public class TimeEntryController {
         return new ResponseEntity<>(newTimeEntry, HttpStatus.CREATED);
     }
 
-    @DeleteMapping
-    public ResponseEntity delete(long timeEntryId) {
+    @DeleteMapping("{timeEntryId}")
+    public ResponseEntity delete(@PathVariable long timeEntryId) {
         timeEntryRepository.delete(timeEntryId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
